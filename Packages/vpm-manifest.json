@@ -1,1 +1,33 @@
-{"dependencies": {}, "locked": {}}
+{
+  "dependencies": {
+    "com.vrcfury.vrcfury": {
+      "version": "1.1258.0"
+    },
+    "com.vrchat.avatars": {
+      "version": "3.9.0"
+    },
+    "best.crux.core": {
+      "version": "0.8.0"
+    }
+  },
+  "locked": {
+    "com.vrcfury.vrcfury": {
+      "version": "1.1258.0",
+      "dependencies": {}
+    },
+    "com.vrchat.avatars": {
+      "version": "3.9.0",
+      "dependencies": {
+        "com.vrchat.base": "3.9.0"
+      }
+    },
+    "com.vrchat.base": {
+      "version": "3.9.0",
+      "dependencies": {}
+    },
+    "best.crux.core": {
+      "version": "0.8.0",
+      "dependencies": {}
+    }
+  }
+}
