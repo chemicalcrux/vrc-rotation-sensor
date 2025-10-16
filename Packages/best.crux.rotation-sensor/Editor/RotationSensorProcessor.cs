@@ -31,6 +31,7 @@ namespace Crux.RotationSensor.Editor
             sensor.transform.localScale = Vector3.one;
 
             var physbone = sensor.AddComponent<VRCPhysBone>();
+            physbone.version = VRCPhysBoneBase.Version.Version_1_1;
 
             physbone.immobile = 1;
             physbone.immobileType = VRCPhysBoneBase.ImmobileType.AllMotion;
