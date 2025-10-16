@@ -1,5 +1,11 @@
 {
   "dependencies": {
+    "best.crux.avatar-sensing": {
+      "version": "file:best.crux.avatar-sensing",
+      "depth": 0,
+      "source": "embedded",
+      "dependencies": {}
+    },
     "best.crux.core": {
       "version": "file:best.crux.core",
       "depth": 0,
@@ -8,12 +14,6 @@
     },
     "best.crux.procedural-controller": {
       "version": "file:best.crux.procedural-controller",
-      "depth": 0,
-      "source": "embedded",
-      "dependencies": {}
-    },
-    "best.crux.rotation-sensor": {
-      "version": "file:best.crux.rotation-sensor",
       "depth": 0,
       "source": "embedded",
       "dependencies": {}
