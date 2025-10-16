@@ -16,7 +16,7 @@ namespace Crux.RotationSensor.Editor
             if (!definition.data.TryUpgradeTo(out RotationSensorDataV1 data))
                 return false;
             
-            var holder = CreateHolder(context.targetObject, definition);
+            var holder = CreateHolder(context.targetObject, context.avatarRoot, definition);
             
             var rotator = new GameObject(definition.name + " Rotator");
             rotator.transform.SetParent(holder.transform);
@@ -34,7 +34,7 @@ namespace Crux.RotationSensor.Editor
             physbone.version = VRCPhysBoneBase.Version.Version_1_1;
 
             physbone.immobile = 1;
-            physbone.immobileType = VRCPhysBoneBase.ImmobileType.AllMotion;
+            physbone.immobileType = VRCPhysBoneBase.ImmobileType.World;
             physbone.isAnimated = true;
 
             physbone.endpointPosition = Vector3.one;
@@ -56,10 +56,10 @@ namespace Crux.RotationSensor.Editor
             return true;
         }
 
-        private static GameObject CreateHolder(GameObject root, RotationSensorDefinition definition)
+        private static GameObject CreateHolder(GameObject parent, GameObject root, RotationSensorDefinition definition)
         {
             var holder = new GameObject(definition.name + " Sensor Holder");
-            holder.transform.SetParent(root.transform);
+            holder.transform.SetParent(parent.transform);
             holder.transform.localPosition = Vector3.zero;
             holder.transform.localRotation = Quaternion.identity;
             holder.transform.localScale = Vector3.one;
@@ -67,14 +67,23 @@ namespace Crux.RotationSensor.Editor
             var origin =
                 AssetReference.ParseAndLoad<GameObject>("50456884b6dc644298cde2d62b600af9,4817090454563823606");
 
-            var holderConstraint = holder.AddComponent<VRCRotationConstraint>();
-            holderConstraint.Sources.Add(new VRCConstraintSource
+            var rotationConstraint = holder.AddComponent<VRCRotationConstraint>();
+            rotationConstraint.Sources.Add(new VRCConstraintSource
             {
                 SourceTransform = origin.transform,
                 Weight = 1f
             });
             
-            holderConstraint.ZeroConstraint();
+            rotationConstraint.ZeroConstraint();
+            
+            var positionConstraint = holder.AddComponent<VRCPositionConstraint>();
+            positionConstraint.Sources.Add(new VRCConstraintSource
+            {
+                SourceTransform = root.transform,
+                Weight = 1f
+            });
+            
+            positionConstraint.ZeroConstraint();
 
             return holder;
         }
