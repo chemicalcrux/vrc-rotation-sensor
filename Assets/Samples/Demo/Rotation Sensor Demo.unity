@@ -193,6 +193,10 @@ PrefabInstance:
         type: 3}
       insertIndex: -1
       addedObject: {fileID: 299872979}
+    - targetCorrespondingSourceObject: {fileID: -8679921383154817045, guid: f81e8172c337a714894d6fdbd0900d8d,
+        type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 351741866}
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: f81e8172c337a714894d6fdbd0900d8d,
         type: 3}
@@ -237,7 +241,9 @@ MonoBehaviour:
     - rid: 3602565576550252544
       type: {class: RotationSensorDataV1, ns: Crux.RotationSensor.Runtime.Data, asm: Crux.RotationSensor.Runtime}
       data:
-        parameterName: Sensor/Left Leg
+        standalone: 1
+        targetTransform: {fileID: 0}
+        parameterName: Movement
 --- !u!1 &62257688 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 919132149155446097, guid: f81e8172c337a714894d6fdbd0900d8d,
@@ -451,7 +457,7 @@ GameObject:
   - component: {fileID: 299872980}
   - component: {fileID: 299872981}
   m_Layer: 0
-  m_Name: Demo Scaler
+  m_Name: Standalone Demo
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -505,15 +511,14 @@ MonoBehaviour:
             version: 1
             fileID: 0
             guid: 
-            id: e27cca87f0c2441f9a9d5e32e27df84e|Assets/Samples/Demo/Demo Scaler/Demo
-              Scaler - Controller.controller
-            objRef: {fileID: 9100000, guid: e27cca87f0c2441f9a9d5e32e27df84e, type: 2}
+            id: 908d5126ee8804400a62542dd52b9911|Assets/Samples/Demo/Demo - Controller.controller
+            objRef: {fileID: 9100000, guid: 908d5126ee8804400a62542dd52b9911, type: 2}
           type: 5
         menus: []
         prms: []
         smoothedPrms: []
         globalParams:
-        - '*'
+        - Movement_Angle
         allNonsyncedAreGlobal: 0
         ignoreSaved: 0
         toggleParam: 
@@ -553,9 +558,9 @@ Animator:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 299872978}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: e27cca87f0c2441f9a9d5e32e27df84e, type: 2}
+  m_Controller: {fileID: 9100000, guid: 908d5126ee8804400a62542dd52b9911, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -566,6 +571,92 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!1 &351741865
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 351741866}
+  - component: {fileID: 351741868}
+  - component: {fileID: 351741867}
+  m_Layer: 0
+  m_Name: Procedural Demo
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &351741866
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 351741865}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2, y: 0.75, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 1919451385}
+  m_Father: {fileID: 1409495118}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &351741867
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 351741865}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 30810cfb7fbe0411d97d24b4280f90ee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  data:
+    rid: 3602565618264965123
+  references:
+    version: 2
+    RefIds:
+    - rid: 3602565618264965123
+      type: {class: RotationSensorDataV1, ns: Crux.RotationSensor.Runtime.Data, asm: Crux.RotationSensor.Runtime}
+      data:
+        standalone: 0
+        targetTransform: {fileID: 1798613149}
+        parameterName: Movement
+--- !u!114 &351741868
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 351741865}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78006f22d5e0e47d9be8c436273a4dff, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  data:
+    rid: 3602565618264965122
+  references:
+    version: 2
+    RefIds:
+    - rid: 3602565618264965122
+      type: {class: ProceduralControllerDataV1, ns: Crux.ProceduralController.Runtime,
+        asm: Crux.ProceduralController.Runtime}
+      data:
+        assetModels:
+          list:
+          - {fileID: 11400000, guid: 2afc1d298fd5240b482a0acc57f54506, type: 2}
+        componentModels:
+          list:
+          - {fileID: 351741867}
+        menuPrefix: 
+        menuIcon: {fileID: 0}
 --- !u!1 &359314728
 GameObject:
   m_ObjectHideFlags: 0
@@ -1035,6 +1126,95 @@ Transform:
     type: 3}
   m_PrefabInstance: {fileID: 62257685}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &1798613149 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 6162258519646862899, guid: f81e8172c337a714894d6fdbd0900d8d,
+    type: 3}
+  m_PrefabInstance: {fileID: 62257685}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1919451384
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1919451385}
+  - component: {fileID: 1919451387}
+  - component: {fileID: 1919451386}
+  m_Layer: 0
+  m_Name: Cube
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1919451385
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1919451384}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 351741866}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!23 &1919451386
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1919451384}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &1919451387
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1919451384}
+  m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

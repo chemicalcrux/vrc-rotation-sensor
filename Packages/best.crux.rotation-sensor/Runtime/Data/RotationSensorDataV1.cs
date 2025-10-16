@@ -1,5 +1,6 @@
 using System;
 using Crux.Core.Runtime.Upgrades;
+using UnityEngine;
 
 namespace Crux.RotationSensor.Runtime.Data
 {
@@ -7,6 +8,8 @@ namespace Crux.RotationSensor.Runtime.Data
     [UpgradableVersion(1)]
     internal class RotationSensorDataV1 : RotationSensorData
     {
+        public bool standalone = true;
+        public Transform targetTransform;
         public string parameterName;
         
         public override RotationSensorData Upgrade()

@@ -1,37 +1,22 @@
-using System.Data;
-using com.vrcfury.api;
 using Crux.Core.Editor;
+using Crux.ProceduralController.Editor;
 using Crux.RotationSensor.Runtime;
 using Crux.RotationSensor.Runtime.Data;
 using UnityEngine;
 using VRC.Dynamics;
 using VRC.SDK3.Dynamics.Constraint.Components;
 using VRC.SDK3.Dynamics.PhysBone.Components;
-using VRC.SDKBase.Editor.BuildPipeline;
 
 namespace Crux.RotationSensor.Editor
 {
-    public class RotationSensorProcessor : IVRCSDKPreprocessAvatarCallback
+    public static class RotationSensorProcessor
     {
-        public int callbackOrder => -10010;
-        
-        public bool OnPreprocessAvatar(GameObject avatarGameObject)
-        {
-            foreach (var target in avatarGameObject.GetComponentsInChildren<RotationSensorDefinition>())
-            {
-                if (!Process(avatarGameObject, target))
-                    return false;
-            }
-
-            return true;
-        }
-
-        private bool Process(GameObject root, RotationSensorDefinition definition)
+        public static bool Process(Context context, RotationSensorDefinition definition)
         {
             if (!definition.data.TryUpgradeTo(out RotationSensorDataV1 data))
                 return false;
             
-            var holder = CreateHolder(root, definition);
+            var holder = CreateHolder(context.targetObject, definition);
             
             var rotator = new GameObject(definition.name + " Rotator");
             rotator.transform.SetParent(holder.transform);
@@ -48,18 +33,20 @@ namespace Crux.RotationSensor.Editor
             var physbone = sensor.AddComponent<VRCPhysBone>();
 
             physbone.immobile = 1;
-            physbone.immobileType = VRCPhysBoneBase.ImmobileType.World;
+            physbone.immobileType = VRCPhysBoneBase.ImmobileType.AllMotion;
             physbone.isAnimated = true;
 
             physbone.endpointPosition = Vector3.one;
             physbone.parameter = data.parameterName;
+
+            Transform target = data.targetTransform == null ? definition.transform : data.targetTransform;
 
             var constraint = rotator.AddComponent<VRCRotationConstraint>();
 
             constraint.SolveInLocalSpace = true;
             constraint.Sources.Add(new VRCConstraintSource()
             {
-                SourceTransform = definition.transform,
+                SourceTransform = target,
                 Weight = 1f
             });
 
@@ -68,7 +55,7 @@ namespace Crux.RotationSensor.Editor
             return true;
         }
 
-        private GameObject CreateHolder(GameObject root, RotationSensorDefinition definition)
+        private static GameObject CreateHolder(GameObject root, RotationSensorDefinition definition)
         {
             var holder = new GameObject(definition.name + " Sensor Holder");
             holder.transform.SetParent(root.transform);

@@ -1,13 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
+using Crux.ProceduralController.Runtime.Models;
 using Crux.RotationSensor.Runtime.Data;
 using UnityEngine;
 using VRC.SDKBase;
 
 namespace Crux.RotationSensor.Runtime
 {
-    
-    public class RotationSensorDefinition : MonoBehaviour, IEditorOnly
+    public class RotationSensorDefinition : ComponentModel, IEditorOnly
     {
         [SerializeField, SerializeReference] internal RotationSensorData data = new RotationSensorDataV1();
 
