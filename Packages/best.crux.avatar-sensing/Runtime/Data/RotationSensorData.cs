@@ -1,7 +1,7 @@
 using System;
 using Crux.Core.Runtime.Upgrades;
 
-namespace Crux.RotationSensor.Runtime.Data
+namespace Crux.AvatarSensing.Runtime.Data
 {
     [Serializable]
     [UpgradableLatestVersion(1)]

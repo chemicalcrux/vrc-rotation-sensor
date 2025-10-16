@@ -296,7 +296,7 @@ MonoBehaviour:
     version: 2
     RefIds:
     - rid: 3602565576550252544
-      type: {class: RotationSensorDataV1, ns: Crux.RotationSensor.Runtime.Data, asm: Crux.RotationSensor.Runtime}
+      type: {class: RotationSensorDataV1, ns: Crux.AvatarSensing.Runtime.Data, asm: Crux.AvatarSensing.Runtime}
       data:
         standalone: 1
         targetTransform: {fileID: 0}
@@ -680,7 +680,7 @@ MonoBehaviour:
     version: 2
     RefIds:
     - rid: 3602565618264965123
-      type: {class: RotationSensorDataV1, ns: Crux.RotationSensor.Runtime.Data, asm: Crux.RotationSensor.Runtime}
+      type: {class: RotationSensorDataV1, ns: Crux.AvatarSensing.Runtime.Data, asm: Crux.AvatarSensing.Runtime}
       data:
         standalone: 0
         targetTransform: {fileID: 1798613149}

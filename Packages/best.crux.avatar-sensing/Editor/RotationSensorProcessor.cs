@@ -1,13 +1,13 @@
+using Crux.AvatarSensing.Runtime;
+using Crux.AvatarSensing.Runtime.Data;
 using Crux.Core.Editor;
 using Crux.ProceduralController.Editor;
-using Crux.RotationSensor.Runtime;
-using Crux.RotationSensor.Runtime.Data;
 using UnityEngine;
 using VRC.Dynamics;
 using VRC.SDK3.Dynamics.Constraint.Components;
 using VRC.SDK3.Dynamics.PhysBone.Components;
 
-namespace Crux.RotationSensor.Editor
+namespace Crux.AvatarSensing.Editor
 {
     public static class RotationSensorProcessor
     {

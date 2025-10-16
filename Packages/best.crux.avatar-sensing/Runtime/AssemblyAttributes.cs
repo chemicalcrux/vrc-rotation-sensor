@@ -1,3 +1,3 @@
 using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("Crux.RotationSensor.Editor")]
+[assembly: InternalsVisibleTo("Crux.AvatarSensing.Editor")]

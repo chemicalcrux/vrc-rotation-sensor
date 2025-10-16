@@ -1,10 +1,10 @@
+using Crux.AvatarSensing.Runtime;
+using Crux.AvatarSensing.Runtime.Data;
 using Crux.ProceduralController.Editor;
 using Crux.ProceduralController.Editor.Processors;
-using Crux.RotationSensor.Runtime;
-using Crux.RotationSensor.Runtime.Data;
 using JetBrains.Annotations;
 
-namespace Crux.RotationSensor.Editor
+namespace Crux.AvatarSensing.Editor
 {
     [UsedImplicitly]
     public class RotationSensorProcessorProcedural : Processor<RotationSensorDefinition>

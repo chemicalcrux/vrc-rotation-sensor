@@ -1,6 +1,6 @@
 {
-    "name": "Crux.RotationSensor.Editor",
-    "rootNamespace": "Crux.RotationSensor.Editor",
+    "name": "Crux.AvatarSensing.Editor",
+    "rootNamespace": "Crux.AvatarSensing.Editor",
     "references": [
         "GUID:3456780c4fb2d324ab9c633d6f1b0ddb",
         "GUID:5718fb738711cd34ea54e9553040911d",

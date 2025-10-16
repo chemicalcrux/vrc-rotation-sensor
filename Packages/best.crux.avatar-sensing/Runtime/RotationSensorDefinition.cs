@@ -1,12 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
+using Crux.AvatarSensing.Runtime.Data;
 using Crux.Core.Runtime.Attributes;
 using Crux.ProceduralController.Runtime.Models;
-using Crux.RotationSensor.Runtime.Data;
 using UnityEngine;
 using VRC.SDKBase;
 
-namespace Crux.RotationSensor.Runtime
+namespace Crux.AvatarSensing.Runtime
 {
     [HideIcon]
     public class RotationSensorDefinition : ComponentModel, IEditorOnly

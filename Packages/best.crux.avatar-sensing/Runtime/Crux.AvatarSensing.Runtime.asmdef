@@ -1,6 +1,6 @@
 {
-    "name": "Crux.RotationSensor.Runtime",
-    "rootNamespace": "Crux.RotationSensor.Runtime",
+    "name": "Crux.AvatarSensing.Runtime",
+    "rootNamespace": "Crux.AvatarSensing.Runtime",
     "references": [
         "GUID:1cdc6dedefbda46a6b25f4afc8d269f1",
         "GUID:095df8f1a90724013b1c492e5ce28301"
