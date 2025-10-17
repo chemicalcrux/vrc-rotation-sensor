@@ -43,7 +43,7 @@ namespace Crux.AvatarSensing.Runtime.Data
             public FootstepEvent eventKind;
             public string parameterName;
 
-            public string GetParameter(FootstepSensorDataV1 data, FootstepSensorDataV1.FootstepTarget target)
+            public string GetParameter(FootstepSensorDataV1 data, FootstepTarget target)
             {
                 string result = data.outputPrefix;
 
@@ -58,6 +58,34 @@ namespace Crux.AvatarSensing.Runtime.Data
             }
         }
 
+        internal enum FootstepState
+        {
+            FootDownHold,
+            FootUpHold,
+        }
+
+        [Serializable]
+        internal class FootstepStateEntry
+        {
+            public FootstepState stateKind;
+            public string parameterName;
+
+            public string GetParameter(FootstepSensorDataV1 data, FootstepTarget target)
+            {
+                string result = data.outputPrefix;
+
+                result += target.identifier;
+
+                if (string.IsNullOrEmpty(parameterName))
+                    result += "-" + stateKind;
+                else
+                    result += "-" + parameterName;
+
+                return result;
+            }
+        }
+
+
         internal enum FootstepValue
         {
             GroundProximity
@@ -70,6 +98,20 @@ namespace Crux.AvatarSensing.Runtime.Data
             public string parameterName;
             public Vector2 inputRange = new Vector2(0, 1);
             public Vector2 outputRange = new Vector2(0, 1);
+
+            public string GetParameter(FootstepSensorDataV1 data, FootstepTarget target)
+            {
+                string result = data.outputPrefix;
+
+                result += target.identifier;
+
+                if (string.IsNullOrEmpty(parameterName))
+                    result += "-" + valueKind;
+                else
+                    result += "-" + parameterName;
+
+                return result;
+            }
         }
 
         public bool standalone;
@@ -81,11 +123,12 @@ namespace Crux.AvatarSensing.Runtime.Data
         
         public VRCPhysBoneCollider floorCollider;
 
-        public float eventHoldTime = 0f;
+        public float eventHoldTime;
 
-        public List<FootstepTarget> targets;
-        public List<FootstepEventEntry> events;
-        public List<FootstepValueEntry> values;
+        public List<FootstepTarget> targets = new();
+        public List<FootstepEventEntry> events = new();
+        public List<FootstepStateEntry> states = new();
+        public List<FootstepValueEntry> values = new();
 
         public override FootstepSensorData Upgrade()
         {

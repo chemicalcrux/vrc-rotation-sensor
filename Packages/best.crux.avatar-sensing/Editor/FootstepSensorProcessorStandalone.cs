@@ -43,6 +43,14 @@ namespace Crux.AvatarSensing.Editor
                 {
                     context.receiver.AddGlobalParameter(evt.GetParameter(data, target));
                 }
+                foreach (var state in data.states)
+                {
+                    context.receiver.AddGlobalParameter(state.GetParameter(data, target));
+                }
+                foreach (var value in data.values)
+                {
+                    context.receiver.AddGlobalParameter(value.GetParameter(data, target));
+                }
             }
 
             return FootstepSensorProcessor.Process(context, definition);
