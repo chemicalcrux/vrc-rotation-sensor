@@ -67,6 +67,7 @@ namespace Crux.AvatarSensing.Editor
                 physbone.colliders.Add(data.floorCollider);
 
                 physbone.endpointPosition = new Vector3(0, -0.3f, 0);
+                physbone.isAnimated = true;
             }
         }
 
