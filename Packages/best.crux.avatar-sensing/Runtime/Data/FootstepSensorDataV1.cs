@@ -96,8 +96,6 @@ namespace Crux.AvatarSensing.Runtime.Data
         {
             public FootstepValue valueKind;
             public string parameterName;
-            public Vector2 inputRange = new Vector2(0, 1);
-            public Vector2 outputRange = new Vector2(0, 1);
 
             public string GetParameter(FootstepSensorDataV1 data, FootstepTarget target)
             {
