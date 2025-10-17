@@ -1,0 +1,287 @@
+using System.Linq;
+using Crux.AvatarSensing.Runtime;
+using Crux.AvatarSensing.Runtime.Data;
+using Crux.ProceduralController.Editor;
+using UnityEditor.Animations;
+using UnityEngine;
+using VRC.Dynamics;
+using VRC.SDK3.Avatars.Components;
+using VRC.SDK3.Dynamics.Constraint.Components;
+using VRC.SDK3.Dynamics.PhysBone.Components;
+using VRC.SDKBase;
+
+namespace Crux.AvatarSensing.Editor
+{
+    public static class FootstepSensorProcessor
+    {
+        public static bool Process(Context context, FootstepSensorDefinition definition)
+        {
+            if (!definition.data.TryUpgradeTo(out FootstepSensorDataV1 data))
+                return false;
+
+            var controller = new AnimatorController();
+
+            CreateSensors(context, data);
+            AddParameters(controller, data);
+
+            foreach (var target in data.targets)
+                controller.AddLayer(CreateEventLayer(context, data, target));
+
+            context.receiver.AddController(controller);
+
+            return true;
+        }
+
+        private static void CreateSensors(Context context, FootstepSensorDataV1 data)
+        {
+            foreach (var target in data.targets)
+            {
+                var holder = new GameObject("Footstep Holder - " + target.identifier);
+                holder.transform.SetParent(context.targetObject.transform, false);
+
+                var positionConstraint = holder.AddComponent<VRCPositionConstraint>();
+
+                positionConstraint.Sources.Add(new VRCConstraintSource
+                {
+                    SourceTransform = target.transform,
+                    Weight = 1f
+                });
+
+                positionConstraint.ZeroConstraint();
+
+                var physbone = holder.transform.gameObject.AddComponent<VRCPhysBone>();
+
+                physbone.parameter = target.GetPhysboneParameter(data);
+
+                physbone.version = VRCPhysBoneBase.Version.Version_1_1;
+
+                physbone.pull = 1f;
+                physbone.spring = 0f;
+                physbone.allowGrabbing = VRCPhysBoneBase.AdvancedBool.False;
+                
+                physbone.radius = 0.03f;
+
+                physbone.colliders.Add(data.floorCollider);
+
+                physbone.endpointPosition = new Vector3(0, -0.3f, 0);
+            }
+        }
+
+        private static void AddParameters(AnimatorController controller, FootstepSensorDataV1 data)
+        {
+            controller.AddParameter(data.enableParameter, AnimatorControllerParameterType.Bool);
+
+            controller.AddParameter("Constant/One", AnimatorControllerParameterType.Float);
+
+            var paramz = controller.parameters;
+            paramz[^1].defaultFloat = 1f;
+            controller.parameters = paramz;
+            
+            foreach (var target in data.targets)
+            {
+                controller.AddParameter(target.GetInputParameter(data), AnimatorControllerParameterType.Float);
+
+                foreach (var eventData in data.events)
+                {
+                    controller.AddParameter(eventData.GetParameter(data, target), AnimatorControllerParameterType.Bool);
+                }
+            }
+        }
+
+        private static AnimatorControllerLayer CreateEventLayer(Context context, FootstepSensorDataV1 data,
+            FootstepSensorDataV1.FootstepTarget target)
+        {
+            var machine = new AnimatorStateMachine
+            {
+                name = "Footstep Events"
+            };
+
+            var layer = new AnimatorControllerLayer
+            {
+                name = machine.name,
+                defaultWeight = 1f,
+                stateMachine = machine
+            };
+
+            var stateIdle = machine.AddState("Idle");
+            var stateDud = machine.AddState("Dud");
+            var stateFootDown = machine.AddState("FootDown");
+            var stateFootDownWait = machine.AddState("FootDownWait");
+            var stateFootUp = machine.AddState("FootUp");
+
+            // Idle -> Dud
+            {
+                var transition = stateIdle.AddTransition(stateDud);
+
+                transition.hasExitTime = false;
+                transition.duration = 0f;
+
+                transition.AddCondition(AnimatorConditionMode.IfNot, 0, data.enableParameter);
+                transition.AddCondition(AnimatorConditionMode.Greater, 0.5f, target.GetInputParameter(data));
+            }
+
+            // Dud -> Idle
+            {
+                var transition = stateDud.AddTransition(stateIdle);
+
+                transition.hasExitTime = false;
+                transition.duration = 0f;
+
+                transition.AddCondition(AnimatorConditionMode.Less, 0.5f, target.GetInputParameter(data));
+            }
+
+            // Idle -> FootDown
+            {
+                var transition = stateIdle.AddTransition(stateFootDown);
+
+                transition.hasExitTime = false;
+                transition.duration = 0f;
+
+                transition.AddCondition(AnimatorConditionMode.If, 0, data.enableParameter);
+                transition.AddCondition(AnimatorConditionMode.Greater, 0.5f, target.GetInputParameter(data));
+            }
+
+            // FootDown -> FootDownWait
+            {
+                var transition = stateFootDown.AddTransition(stateFootDownWait);
+                
+                transition.duration = 0f;
+
+                if (data.eventHoldTime > 0)
+                {
+                    transition.hasExitTime = true;
+                    transition.exitTime = 1;
+
+                    stateFootDown.speed = 1f / data.eventHoldTime;
+                }
+                else
+                {
+                    transition.hasExitTime = false;
+
+                    transition.AddCondition(AnimatorConditionMode.Greater, 0, "Constant/One");
+                }
+            }
+
+            // FootDownWait -> FootUp
+            {
+                var transition = stateFootDownWait.AddTransition(stateFootUp);
+
+                transition.hasExitTime = false;
+                transition.duration = 0f;
+
+                transition.AddCondition(AnimatorConditionMode.Less, 0.5f, target.GetInputParameter(data));
+            }
+
+            // FootDown -> FootUp
+            {
+                var transition = stateFootDown.AddTransition(stateFootUp);
+
+                transition.hasExitTime = false;
+                transition.duration = 0f;
+
+                transition.AddCondition(AnimatorConditionMode.Less, 0.5f, target.GetInputParameter(data));
+            }
+
+            // FootDown -> FootDownWait
+            {
+                var transition = stateFootUp.AddTransition(stateIdle);
+                
+                transition.duration = 0f;
+
+                if (data.eventHoldTime > 0)
+                {
+                    transition.hasExitTime = true;
+                    transition.exitTime = 1;
+
+                    stateFootDown.speed = 1f / data.eventHoldTime;
+                }
+                else
+                {
+                    transition.hasExitTime = false;
+
+                    transition.AddCondition(AnimatorConditionMode.Greater, 0, "Constant/One");
+                }
+            }
+
+            // FootUp -> FootDown
+            {
+                var transition = stateFootUp.AddTransition(stateFootDown);
+
+                transition.hasExitTime = false;
+                transition.duration = 0f;
+
+                transition.AddCondition(AnimatorConditionMode.Greater, 0.5f, target.GetInputParameter(data));
+            }
+
+            VRCAvatarParameterDriver driverFootDown = null;
+            VRCAvatarParameterDriver driverFootDownWait = null;
+            VRCAvatarParameterDriver driverFootUp = null;
+            VRCAvatarParameterDriver driverIdle = null;
+
+            foreach (var evt in data.events.Where(evt =>
+                         evt.eventKind == FootstepSensorDataV1.FootstepEvent.FootDown))
+            {
+                if (!driverFootDown)
+                    driverFootDown = stateFootDown.AddStateMachineBehaviour<VRCAvatarParameterDriver>();
+                if (!driverFootDownWait)
+                    driverFootDownWait = stateFootDownWait.AddStateMachineBehaviour<VRCAvatarParameterDriver>();
+                if (!driverFootUp)
+                    driverFootUp = stateFootUp.AddStateMachineBehaviour<VRCAvatarParameterDriver>();
+
+                driverFootDown.parameters.Add(new VRC_AvatarParameterDriver.Parameter
+                {
+                    name = evt.GetParameter(data, target),
+                    type = VRC_AvatarParameterDriver.ChangeType.Set,
+                    value = 1f
+                });
+
+                driverFootDownWait.parameters.Add(new VRC_AvatarParameterDriver.Parameter
+                {
+                    name = evt.GetParameter(data, target),
+                    type = VRC_AvatarParameterDriver.ChangeType.Set,
+                    value = 0f
+                });
+
+                driverFootUp.parameters.Add(new VRC_AvatarParameterDriver.Parameter
+                {
+                    name = evt.GetParameter(data, target),
+                    type = VRC_AvatarParameterDriver.ChangeType.Set,
+                    value = 0f
+                });
+            }
+
+            foreach (var evt in data.events.Where(evt => evt.eventKind == FootstepSensorDataV1.FootstepEvent.FootUp))
+            {
+                if (!driverFootUp)
+                    driverFootUp = stateFootUp.AddStateMachineBehaviour<VRCAvatarParameterDriver>();
+                if (!driverIdle)
+                    driverIdle = stateIdle.AddStateMachineBehaviour<VRCAvatarParameterDriver>();
+                if (!driverFootDown)
+                    driverFootDown = stateFootDown.AddStateMachineBehaviour<VRCAvatarParameterDriver>();
+
+                driverFootUp.parameters.Add(new VRC_AvatarParameterDriver.Parameter
+                {
+                    name = evt.GetParameter(data, target),
+                    type = VRC_AvatarParameterDriver.ChangeType.Set,
+                    value = 1f
+                });
+
+                driverIdle.parameters.Add(new VRC_AvatarParameterDriver.Parameter
+                {
+                    name = evt.GetParameter(data, target),
+                    type = VRC_AvatarParameterDriver.ChangeType.Set,
+                    value = 0f
+                });
+
+                driverFootDown.parameters.Add(new VRC_AvatarParameterDriver.Parameter
+                {
+                    name = evt.GetParameter(data, target),
+                    type = VRC_AvatarParameterDriver.ChangeType.Set,
+                    value = 0f
+                });
+            }
+
+            return layer;
+        }
+    }
+}
