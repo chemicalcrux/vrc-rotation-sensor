@@ -370,7 +370,7 @@ namespace Crux.AvatarSensing.Editor
 
             foreach (var target in data.targets)
             {
-                var targetRoot = new BlendTree()
+                var targetRoot = new BlendTree
                 {
                     name = target.identifier + " Root",
                     blendType = BlendTreeType.Direct

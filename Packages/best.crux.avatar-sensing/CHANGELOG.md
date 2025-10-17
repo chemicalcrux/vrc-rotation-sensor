@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- RotationSensorDefinition, which can be used either:
-  - As a standalone source of rotation rate
+- RotationSensorDefinition, which measures how quickly single bones are rotating.
+- FootstepSensorDefinition, which can detect foot down/up events, as well as measure ground proximity.
+- All of these can be used:
+  - Standalone, providing a globally-visible parameter
   - In a ProceduralController
