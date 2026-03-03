@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- Contact-based footsteps now handle avatar scaling more reliably
+  - The radius of the receivers goes up so that the relative size of the senders and receivers stays constant
+  - The floor adjustment now scales based on avatar size
+  - Both of these are based on EyeHeightAsMeters
+
 ## [0.2.5] - 2026-02-12
 
 ### Added

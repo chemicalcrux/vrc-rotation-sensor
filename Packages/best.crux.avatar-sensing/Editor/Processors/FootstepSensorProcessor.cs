@@ -4,9 +4,11 @@ using System.Linq;
 using com.vrcfury.api;
 using Crux.AvatarSensing.Runtime;
 using Crux.AvatarSensing.Runtime.Data;
+using Crux.Core.Editor;
 using Crux.ProceduralController.Editor;
 using UnityEditor.Animations;
 using UnityEngine;
+using VRC.Core;
 using VRC.Dynamics;
 using VRC.SDK3.Avatars.Components;
 using VRC.SDK3.Avatars.ScriptableObjects;
@@ -14,6 +16,8 @@ using VRC.SDK3.Dynamics.Constraint.Components;
 using VRC.SDK3.Dynamics.Contact.Components;
 using VRC.SDK3.Dynamics.PhysBone.Components;
 using VRC.SDKBase;
+
+using static VRC.Core.ExtensionMethods;
 
 #pragma warning disable CS8524 // The switch expression does not handle some values of its input type (it is not exhaustive) involving an unnamed enum value.
 
@@ -42,8 +46,9 @@ namespace Crux.AvatarSensing.Editor.Processors
             List<VRCExpressionParameters.Parameter> paramzList = new List<VRCExpressionParameters.Parameter>();
 
             InitializeState(context, data, state);
-            CreateSensors(context, data, state);
+
             AddParameters(controller, data, paramzList);
+            CreateSensors(context, controller, data, state);
 
             paramz.parameters = paramzList.ToArray();
 
@@ -141,12 +146,12 @@ namespace Crux.AvatarSensing.Editor.Processors
             }
         }
 
-        private static void CreateSensors(Context context, FootstepSensorDataV1 data, ProcessorState state)
+        private static void CreateSensors(Context context, AnimatorController controller, FootstepSensorDataV1 data, ProcessorState state)
         {
             if (data.mode == FootstepSensorDataV1.Mode.Physbones)
                 CreatePhysboneSensors(context, data, state);
             else if (data.mode == FootstepSensorDataV1.Mode.Contacts)
-                CreateContactSensors(context, data, state);
+                CreateContactSensors(context, controller, data, state);
         }
 
         private static void CreatePhysboneSensors(Context context, FootstepSensorDataV1 data, ProcessorState state)
@@ -192,8 +197,52 @@ namespace Crux.AvatarSensing.Editor.Processors
             }
         }
 
-        private static void CreateContactSensors(Context context, FootstepSensorDataV1 data, ProcessorState state)
+        private static void CreateContactSensors(Context context, AnimatorController controller, FootstepSensorDataV1 data, ProcessorState state)
         {
+            var machine = new AnimatorStateMachine
+            {
+                name = "Contact Sensor Machine"
+            };
+
+            var layer = new AnimatorControllerLayer
+            {
+                name = "Contact Sensors",
+                defaultWeight = 1f,
+                stateMachine = machine
+            };
+
+            controller.AddLayer(layer);
+
+            var sizeState = machine.AddState("Size");
+
+            var sizeTree = new BlendTree()
+            {
+                blendParameter = "EyeHeightAsMeters",
+                useAutomaticThresholds = false
+            };
+
+            sizeState.motion = sizeTree;
+            
+            var sizeClipMin = new AnimationClip()
+            {
+                name = "Contact Size - Min"
+            };
+
+            var sizeClipMax = new AnimationClip()
+            {
+                name = "Contact Size - Min"
+            };
+
+            sizeTree.AddChild(sizeClipMin);
+            sizeTree.AddChild(sizeClipMax);
+
+            var children = sizeTree.children;
+
+            children[0].threshold = 0f;
+            children[1].threshold = 10f;
+
+            sizeTree.children = children;
+            
             var floorRoot = new GameObject("Footstep Floor Root");
             floorRoot.transform.SetParent(context.targetObject.transform, false);
 
@@ -208,12 +257,25 @@ namespace Crux.AvatarSensing.Editor.Processors
 
             floorConstraint.ZeroConstraint();
 
+
             var floorPivot = new GameObject("Footstep Floor Pivot");
             floorPivot.transform.SetParent(floorRoot.transform, false);
             floorPivot.transform.localPosition = Vector3.up * data.contactFloorHeight;
 
             state.contactFloorPivot = floorPivot;
+            
+            var scaleConstraint = floorPivot.AddComponent<VRCScaleConstraint>();
+            var worldTransform =
+                AssetReference.ParseAndLoad<Transform>("50456884b6dc644298cde2d62b600af9,7878656513693576434");
 
+            scaleConstraint.Sources.Add(new VRCConstraintSource
+            {
+                SourceTransform = worldTransform,
+                Weight = 1f
+            });
+
+            scaleConstraint.ZeroConstraint();
+            
             foreach (var target in data.targets)
             {
                 var senderHolder = new GameObject($"Footstep Sender - {target.GetIdentifier()}");
@@ -274,6 +336,15 @@ namespace Crux.AvatarSensing.Editor.Processors
                 receiver.position = Vector3.down * (receiver.height / 2f - receiver.radius);
                 receiver.collisionValue = 1f;
                 receiver.receiverType = ContactReceiver.ReceiverType.Proximity;
+
+                var path = VRC.Core.ExtensionMethods.GetHierarchyPath(receiver.transform, context.targetObject.transform);
+                var type = receiver.GetType();
+
+                sizeClipMin.SetCurve(path, type, nameof(receiver.radius), AnimationCurve.Constant(0, 1, 0));
+                sizeClipMax.SetCurve(path, type, nameof(receiver.radius), AnimationCurve.Constant(0, 1, 1));
+                
+                sizeClipMin.SetCurve(path, type, nameof(receiver.position) + ".y", AnimationCurve.Constant(0, 1, -1.5f));
+                sizeClipMax.SetCurve(path, type, nameof(receiver.position) + ".y", AnimationCurve.Constant(0, 1, -0.5f));
             }
         }
 
@@ -291,6 +362,8 @@ namespace Crux.AvatarSensing.Editor.Processors
 
             controller.AddParameter(data.enableParameter, AnimatorControllerParameterType.Bool);
 
+            controller.AddParameter("EyeHeightAsMeters", AnimatorControllerParameterType.Float);
+            
             switch (data.mode)
             {
                 case FootstepSensorDataV1.Mode.Physbones:
